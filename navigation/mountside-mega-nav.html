@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mountside Ventures — Navigation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+  /* ============================================================
+     Tokens — pulled from mountsideventures.com's live brand:
+     deep navy field, cream display text, cyan accent, mint CTA.
+     ============================================================ */
+  :root{
+    --navy-header: #24475f;
+    --navy-deep:   #1a3245;
+    --navy-panel:  #1e3a4f;
+    --cream:       #f6efe1;
+    --cream-dim:   rgba(246,239,225,.66);
+    --cream-faint: rgba(246,239,225,.14);
+    --cyan:        #2fe4e8;
+    --mint:        #7ff0e2;
+    --mint-ink:    #113044;
+    --focus-ring:  #ffffff;
+    --header-h: 76px;
+    --header-h-mobile: 64px;
+    font-family: 'Inter', sans-serif;
+  }
+
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: #0f2029;
+    color: var(--cream);
+    font-family: 'Inter', -apple-system, sans-serif;
+  }
+
+  a{ color: inherit; text-decoration:none; }
+  button{ font-family: inherit; background:none; border:none; color:inherit; cursor:pointer; }
+  ul{ list-style:none; margin:0; padding:0; }
+
+  /* visible focus state everywhere, required by the brief */
+  a:focus-visible,
+  button:focus-visible{
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  .site-header{
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--navy-header);
+    position: relative; /* anchor for the mega panel */
+  }
+
+  .header-inner{
+    height: var(--header-h);
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+
+  /* ---- logo ---- */
+  .logo{
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex-shrink: 0;
+  }
+  .logo svg{ display:block; }
+  .logo-word{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    letter-spacing: -0.01em;
+    color: var(--cream);
+    white-space: nowrap;
+  }
+
+  /* ---- desktop nav ---- */
+  .desktop-nav{
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+  }
+  .nav-audience{ display:flex; align-items:center; gap: 4px; }
+  .nav-firm{ display:flex; align-items:center; gap: 4px; margin-left: auto; }
+
+  .nav-item{ position: relative; }
+
+  .nav-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 44px;
+    padding: 0 14px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--cream);
+    border-radius: 8px;
+    white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .nav-link:hover{ color: var(--cyan); }
+
+  .nav-item.is-open > .nav-link,
+  .nav-link[aria-current="page"]{
+    color: var(--cyan);
+  }
+
+  .nav-link .chev{
+    width: 9px; height: 9px;
+    transition: transform .2s ease;
+  }
+  .nav-item.is-open .chev{ transform: rotate(180deg); }
+
+  /* Contact — the deliberately prominent item */
+  .nav-cta{
+    margin-left: 8px;
+    background: var(--mint);
+    color: var(--mint-ink);
+    font-weight: 600;
+    padding: 0 20px;
+    border-radius: 8px;
+  }
+  .nav-cta:hover{ color: var(--mint-ink); filter: brightness(1.06); }
+
+  /* ---- hamburger (mobile) ---- */
+  .hamburger{
+    display: none;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    margin-left: auto;
+    border-radius: 8px;
+  }
+  .hamburger span{
+    position: relative;
+    width: 20px; height: 2px;
+    background: var(--cream);
+    display: block;
+  }
+  .hamburger span::before,
+  .hamburger span::after{
+    content: "";
+    position: absolute; left: 0;
+    width: 20px; height: 2px;
+    background: var(--cream);
+    transition: transform .2s ease;
+  }
+  .hamburger span::before{ top: -6px; }
+  .hamburger span::after{ top: 6px; }
+
+  /* ============================================================
+     MEGA MENU
+     ============================================================ */
+  .mega-wrapper{
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  .mega-panel{
+    position: absolute;
+    top: 0; left: 0; width: 100%;
+    background: var(--navy-deep);
+    border-top: 1px solid var(--cream-faint);
+    box-shadow: 0 24px 48px -18px rgba(0,0,0,.55);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px);
+    transition: opacity .16s ease, transform .16s ease, visibility 0s linear .16s;
+    pointer-events: none;
+  }
+  .mega-panel.is-active{
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .16s ease, transform .16s ease;
+    pointer-events: auto;
+  }
+
+  .mega-inner{
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 44px 32px 52px;
+  }
+
+  .mega-eyebrow-link{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--cream);
+    margin-bottom: 26px;
+  }
+  .mega-eyebrow-link:hover{ color: var(--cyan); }
+  .mega-eyebrow-link svg{ width: 14px; height: 14px; }
+
+  /* -- link "card" used throughout mega menus -- */
+  .mega-link-card{
+    display: block;
+    padding: 14px 16px;
+    margin: 0 -16px;
+    border-radius: 10px;
+    transition: background .15s ease;
+  }
+  .mega-link-card:hover{ background: rgba(255,255,255,.05); }
+  .mega-link-card:hover .mega-link-title{ color: var(--cyan); }
+
+  .mega-link-title{
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--cream);
+    transition: color .15s ease;
+  }
+  .mega-link-desc{
+    display: block;
+    margin-top: 4px;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--cream-dim);
+    max-width: 34ch;
+  }
+
+  .mega-link-title.-sm{ font-size: 14.5px; }
+
+  /* -- For Companies layout -- */
+  #mega-companies .mega-inner{
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 56px;
+  }
+  .mega-col-heading{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: none;
+    color: var(--cream-dim);
+    margin: 0 0 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--cream-faint);
+  }
+  .growth-col .mega-col-heading{ font-size: 14px; color: var(--cream); }
+  .growth-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 24px;
+  }
+  .growth-grid .mega-link-title{ font-size: 17px; }
+
+  .ventures-col .mega-link-card{ margin-bottom: 2px; }
+  .ventures-sub{ margin-top: 8px; padding-left: 4px; }
+  .ventures-sub .mega-link-card{ padding: 9px 12px; margin: 0; }
+
+  /* -- For Investors layout -- */
+  #mega-investors .mega-inner{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .investor-route .mega-link-title{ font-size: 17px; }
+  .investor-route .mega-link-desc{ max-width: none; }
+  .investor-sub{ margin-top: 10px; }
+  .investor-sub .mega-link-card{ padding: 8px 12px; margin: 0; }
+  .investor-sub .mega-link-title{ font-size: 13.5px; color: var(--cream-dim); }
+  .investor-sub .mega-link-card:hover .mega-link-title{ color: var(--cyan); }
+
+  /* -- Resources layout -- */
+  #mega-resources .mega-inner{ padding-top: 40px; }
+  .resources-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .mega-backdrop{
+    position: fixed;
+    inset: var(--header-h) 0 0 0;
+    background: rgba(10,18,24,.45);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .16s ease, visibility 0s linear .16s;
+    z-index: 90;
+  }
+  .mega-backdrop.is-active{
+    opacity: 1; visibility: visible;
+    transition: opacity .16s ease;
+  }
+
+  /* ============================================================
+     MOBILE MENU
+     ============================================================ */
+  .mobile-menu{
+    position: fixed;
+    inset: 0;
+    background: var(--navy-deep);
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    visibility: hidden;
+    transition: transform .28s ease, visibility 0s linear .28s;
+  }
+  .mobile-menu.is-open{
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform .28s ease;
+  }
+
+  .mobile-menu-top{
+    height: var(--header-h-mobile);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--cream-faint);
+  }
+  .mobile-close{
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+  }
+
+  .mobile-views{
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+  .mobile-view{
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding: 8px 20px 40px;
+    transform: translateX(100%);
+    transition: transform .24s ease;
+  }
+  .mobile-view[data-active="true"]{ transform: translateX(0); }
+  .mobile-view[data-offstage="left"]{ transform: translateX(-100%); }
+
+  .mobile-back{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 10px 0 4px;
+    margin: 4px 0 8px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--cream-dim);
+    border-radius: 8px;
+  }
+  .mobile-back svg{ width: 16px; height: 16px; transform: rotate(180deg); }
+
+  .mobile-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 52px;
+    padding: 0 4px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 17px;
+    color: var(--cream);
+    border-bottom: 1px solid var(--cream-faint);
+  }
+  .mobile-item svg{ width: 12px; height: 12px; opacity: .6; }
+
+  .mobile-item.-plain{ font-weight: 500; }
+
+  .mobile-cta{
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 20px;
+    height: 52px;
+    background: var(--mint);
+    color: var(--mint-ink);
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
+  .mobile-section-title{
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--cream);
+    margin: 22px 0 6px;
+  }
+  .mobile-section-title:first-child{ margin-top: 6px; }
+
+  .mobile-link{
+    display: block;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--cream-faint);
+  }
+  .mobile-link-title{
+    display: block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 16px;
+  }
+  .mobile-link-desc{
+    display: block;
+    margin-top: 3px;
+    font-size: 13px;
+    color: var(--cream-dim);
+    line-height: 1.45;
+  }
+  .mobile-link.-sub{ padding-left: 14px; }
+  .mobile-link.-sub .mobile-link-title{ font-size: 14.5px; color: var(--cream-dim); }
+
+  body.no-scroll{ overflow: hidden; }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 980px){
+    .desktop-nav{ display: none; }
+    .hamburger{ display: flex; }
+    .header-inner{ height: var(--header-h-mobile); padding: 0 20px; }
+    .mega-backdrop{ display:none; }
+  }
+
+  /* ---- demo page dressing (not part of the nav component) ---- */
+  .demo-hero{
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 120px 32px 200px;
+  }
+  .demo-hero h1{
+    font-family: 'Poppins', sans-serif;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.08;
+    font-weight: 600;
+    margin: 0 0 20px;
+  }
+  .demo-hero h1 em{ font-style: normal; color: var(--cyan); }
+  .demo-hero p{
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--cream-dim);
+    max-width: 56ch;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+
+    <a href="/" class="logo" aria-label="Mountside Ventures — home">
+      <svg width="34" height="28" viewBox="0 0 34 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 24L8 6L13.5 17.5L18 9L26 24H0Z" fill="#f6efe1"/>
+        <path d="M15 24L23 6L28.5 17.5L33 9L34 24H15Z" fill="#f6efe1" fill-opacity="0.55"/>
+        <circle cx="27" cy="3" r="2.4" fill="#2fe4e8"/>
+      </svg>
+      <span class="logo-word">Mountside Ventures</span>
+    </a>
+
+    <button class="hamburger" id="hamburgerBtn" aria-expanded="false" aria-controls="mobileMenu" aria-label="Open menu">
+      <span></span>
+    </button>
+
+    <nav class="desktop-nav" aria-label="Primary">
+      <ul class="nav-audience">
+        <li class="nav-item" data-nav-item="companies">
+          <button class="nav-link" data-menu-trigger="companies" aria-expanded="false" aria-controls="mega-companies">
+            For Companies
+            <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </li>
+        <li class="nav-item" data-nav-item="investors">
+          <button class="nav-link" data-menu-trigger="investors" aria-expanded="false" aria-controls="mega-investors">
+            For Investors
+            <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </li>
+      </ul>
+
+      <ul class="nav-firm">
+        <li class="nav-item"><a class="nav-link" href="/transactions">Transactions</a></li>
+        <li class="nav-item" data-nav-item="resources">
+          <button class="nav-link" data-menu-trigger="resources" aria-expanded="false" aria-controls="mega-resources">
+            Resources
+            <svg class="chev" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
+        <li class="nav-item"><a class="nav-link nav-cta" href="https://airtable.com/shrqhI5iowDahtunb">Contact</a></li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- ============ MEGA MENU PANELS ============ -->
+  <div class="mega-wrapper" id="megaWrapper">
+
+    <!-- FOR COMPANIES -->
+    <div class="mega-panel" id="mega-companies" role="region" aria-label="For Companies">
+      <div class="mega-inner">
+
+        <div class="growth-col">
+          <p class="mega-col-heading">Growth</p>
+          <div class="growth-grid">
+            <a class="mega-link-card" href="/growth">
+              <span class="mega-link-title">Equity Funding</span>
+              <span class="mega-link-desc">Equity rounds from £10m, venture debt from £2m, and processes spanning both.</span>
+            </a>
+            <a class="mega-link-card" href="/debt">
+              <span class="mega-link-title">Venture Debt</span>
+              <span class="mega-link-desc">Debt facilities that support growth while limiting dilution.</span>
+            </a>
+            <a class="mega-link-card" href="/deals">
+              <span class="mega-link-title">Selected Transactions</span>
+              <span class="mega-link-desc">Selected growth equity and venture debt transactions.</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="ventures-col">
+          <p class="mega-col-heading">Ventures</p>
+          <a class="mega-link-card" href="/ventures">
+            <span class="mega-link-title">Ventures Overview</span>
+            <span class="mega-link-desc">Seed and Series A advisory and investment-readiness support.</span>
+          </a>
+          <div class="ventures-sub">
+            <a class="mega-link-card" href="/accelerator">
+              <span class="mega-link-title -sm">Fundraising Accelerator</span>
+            </a>
+            <a class="mega-link-card" href="/next-round">
+              <span class="mega-link-title -sm">Series A Funding</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOR INVESTORS -->
+    <div class="mega-panel" id="mega-investors" role="region" aria-label="For Investors">
+      <div class="mega-inner">
+
+        <div class="investor-route">
+          <a class="mega-link-card" href="/venture-capital-funds">
+            <span class="mega-link-title">VCs</span>
+          </a>
+          <div class="investor-sub">
+            <a class="mega-link-card" href="/vc-programme">
+              <span class="mega-link-title">VC Programme</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="investor-route">
+          <a class="mega-link-card" href="/limited-partners">
+            <span class="mega-link-title">LPs</span>
+          </a>
+          <div class="investor-sub">
+            <a class="mega-link-card" href="/funding-venture-conference">
+              <span class="mega-link-title">Funding Venture Conference</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="investor-route">
+          <a class="mega-link-card" href="/family-offices">
+            <span class="mega-link-title">Family Offices</span>
+          </a>
+        </div>
+
+        <div class="investor-route">
+          <a class="mega-link-card" href="/lenders">
+            <span class="mega-link-title">Lenders</span>
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="mega-panel" id="mega-resources" role="region" aria-label="Resources">
+      <div class="mega-inner">
+        <a class="mega-eyebrow-link" href="/resources">
+          Resources
+          <svg viewBox="0 0 14 14" fill="none"><path d="M1 7H13M13 7L7 1M13 7L7 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <div class="resources-grid">
+          <a class="mega-link-card" href="/resources#insights">
+            <span class="mega-link-title">Insights</span>
+            <span class="mega-link-desc">Fundraising guidance, market perspectives and client news.</span>
+          </a>
+          <a class="mega-link-card" href="/events">
+            <span class="mega-link-title">Events</span>
+            <span class="mega-link-desc">Upcoming Mountside events for companies and investors.</span>
+          </a>
+          <a class="mega-link-card" href="/investor-network">
+            <span class="mega-link-title">Investor Database</span>
+            <span class="mega-link-desc">Search Mountside's database of active investors.</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</header>
+
+<div class="mega-backdrop" id="megaBackdrop"></div>
+
+<!-- ============ MOBILE MENU ============ -->
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <div class="mobile-menu-top">
+    <a href="/" class="logo" aria-label="Mountside Ventures — home">
+      <svg width="30" height="25" viewBox="0 0 34 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 24L8 6L13.5 17.5L18 9L26 24H0Z" fill="#f6efe1"/>
+        <path d="M15 24L23 6L28.5 17.5L33 9L34 24H15Z" fill="#f6efe1" fill-opacity="0.55"/>
+        <circle cx="27" cy="3" r="2.4" fill="#2fe4e8"/>
+      </svg>
+    </a>
+    <button class="mobile-close" id="mobileCloseBtn" aria-label="Close menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 1L17 17M17 1L1 17" stroke="#f6efe1" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="mobile-views" id="mobileViews">
+
+    <!-- ROOT -->
+    <div class="mobile-view" data-view="root" data-active="true">
+      <button class="mobile-item" data-open-view="companies">
+        For Companies
+        <svg viewBox="0 0 10 10" fill="none"><path d="M1 1L9 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="mobile-item" data-open-view="investors">
+        For Investors
+        <svg viewBox="0 0 10 10" fill="none"><path d="M1 1L9 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="mobile-item -plain" href="/transactions">Transactions</a>
+      <button class="mobile-item" data-open-view="resources">
+        Resources
+        <svg viewBox="0 0 10 10" fill="none"><path d="M1 1L9 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <a class="mobile-item -plain" href="/about">About</a>
+
+      <a class="mobile-cta" href="https://airtable.com/shrqhI5iowDahtunb">Contact</a>
+    </div>
+
+    <!-- FOR COMPANIES -->
+    <div class="mobile-view" data-view="companies">
+      <button class="mobile-back" data-back>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1 8H15M15 8L9 2M15 8L9 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Menu
+      </button>
+
+      <p class="mobile-section-title">Growth</p>
+      <a class="mobile-link" href="/growth">
+        <span class="mobile-link-title">Equity Funding</span>
+        <span class="mobile-link-desc">Equity rounds from £10m, venture debt from £2m, and processes spanning both.</span>
+      </a>
+      <a class="mobile-link" href="/debt">
+        <span class="mobile-link-title">Venture Debt</span>
+        <span class="mobile-link-desc">Debt facilities that support growth while limiting dilution.</span>
+      </a>
+      <a class="mobile-link" href="/deals">
+        <span class="mobile-link-title">Selected Transactions</span>
+        <span class="mobile-link-desc">Selected growth equity and venture debt transactions.</span>
+      </a>
+
+      <p class="mobile-section-title">Ventures</p>
+      <a class="mobile-link" href="/ventures">
+        <span class="mobile-link-title">Ventures Overview</span>
+        <span class="mobile-link-desc">Seed and Series A advisory and investment-readiness support.</span>
+      </a>
+      <a class="mobile-link -sub" href="/accelerator">
+        <span class="mobile-link-title">Fundraising Accelerator</span>
+      </a>
+      <a class="mobile-link -sub" href="/next-round">
+        <span class="mobile-link-title">Series A Funding</span>
+      </a>
+    </div>
+
+    <!-- FOR INVESTORS -->
+    <div class="mobile-view" data-view="investors">
+      <button class="mobile-back" data-back>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1 8H15M15 8L9 2M15 8L9 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Menu
+      </button>
+
+      <a class="mobile-link" href="/venture-capital-funds"><span class="mobile-link-title">VCs</span></a>
+      <a class="mobile-link -sub" href="/vc-programme"><span class="mobile-link-title">VC Programme</span></a>
+
+      <a class="mobile-link" href="/limited-partners"><span class="mobile-link-title">LPs</span></a>
+      <a class="mobile-link -sub" href="/funding-venture-conference"><span class="mobile-link-title">Funding Venture Conference</span></a>
+
+      <a class="mobile-link" href="/family-offices"><span class="mobile-link-title">Family Offices</span></a>
+      <a class="mobile-link" href="/lenders"><span class="mobile-link-title">Lenders</span></a>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="mobile-view" data-view="resources">
+      <button class="mobile-back" data-back>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M1 8H15M15 8L9 2M15 8L9 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Menu
+      </button>
+
+      <a class="mobile-link" href="/resources">
+        <span class="mobile-link-title">Resources overview</span>
+      </a>
+      <a class="mobile-link" href="/resources#insights">
+        <span class="mobile-link-title">Insights</span>
+        <span class="mobile-link-desc">Fundraising guidance, market perspectives and client news.</span>
+      </a>
+      <a class="mobile-link" href="/events">
+        <span class="mobile-link-title">Events</span>
+        <span class="mobile-link-desc">Upcoming Mountside events for companies and investors.</span>
+      </a>
+      <a class="mobile-link" href="/investor-network">
+        <span class="mobile-link-title">Investor Database</span>
+        <span class="mobile-link-desc">Search Mountside's database of active investors.</span>
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============ demo page content (delete in production) ============ -->
+<main class="demo-hero">
+  <h1>Mega navigation, <em>rebuilt.</em></h1>
+  <p>Hover or tab into <strong>For Companies</strong>, <strong>For Investors</strong>, or <strong>Resources</strong> above to see the full-width menu. Resize the window below 980px to see the mobile panel, or press the menu icon.</p>
+</main>
+
+<script>
+(function(){
+
+  /* ============================================================
+     DESKTOP MEGA MENU
+     ============================================================ */
+  var header      = document.getElementById('siteHeader');
+  var backdrop     = document.getElementById('megaBackdrop');
+  var triggers     = Array.prototype.slice.call(document.querySelectorAll('[data-menu-trigger]'));
+  var panels       = {};
+  var navItems     = {};
+  triggers.forEach(function(t){
+    var key = t.getAttribute('data-menu-trigger');
+    panels[key]   = document.getElementById('mega-' + key);
+    navItems[key] = t.closest('.nav-item');
+  });
+
+  var openKey = null;
+  var closeTimer = null;
+
+  function openMenu(key){
+    if (openKey === key) return;
+    closeMenu();
+    openKey = key;
+    var trigger = document.querySelector('[data-menu-trigger="' + key + '"]');
+    trigger.setAttribute('aria-expanded', 'true');
+    navItems[key].classList.add('is-open');
+    panels[key].classList.add('is-active');
+    backdrop.classList.add('is-active');
+  }
+
+  function closeMenu(){
+    if (!openKey) return;
+    var trigger = document.querySelector('[data-menu-trigger="' + openKey + '"]');
+    trigger.setAttribute('aria-expanded', 'false');
+    navItems[openKey].classList.remove('is-open');
+    panels[openKey].classList.remove('is-active');
+    backdrop.classList.remove('is-active');
+    openKey = null;
+  }
+
+  function scheduleClose(){
+    clearTimeout(closeTimer);
+    closeTimer = setTimeout(closeMenu, 140);
+  }
+  function cancelClose(){
+    clearTimeout(closeTimer);
+  }
+
+  triggers.forEach(function(t){
+    var key = t.getAttribute('data-menu-trigger');
+    var item = navItems[key];
+
+    item.addEventListener('mouseenter', function(){
+      cancelClose();
+      openMenu(key);
+    });
+    item.addEventListener('mouseleave', scheduleClose);
+
+    panels[key].addEventListener('mouseenter', cancelClose);
+    panels[key].addEventListener('mouseleave', scheduleClose);
+
+    t.addEventListener('click', function(e){
+      e.preventDefault();
+      if (openKey === key) { closeMenu(); }
+      else { openMenu(key); }
+    });
+
+    t.addEventListener('focus', function(){
+      cancelClose();
+      openMenu(key);
+    });
+  });
+
+  // close on click outside
+  document.addEventListener('click', function(e){
+    if (!openKey) return;
+    var withinHeader = header.contains(e.target);
+    if (!withinHeader) closeMenu();
+  });
+
+  // close when focus leaves the header entirely
+  document.addEventListener('focusin', function(e){
+    if (!openKey) return;
+    if (!header.contains(e.target)) closeMenu();
+  });
+
+  // close + return focus to trigger on Escape
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && openKey){
+      var t = document.querySelector('[data-menu-trigger="' + openKey + '"]');
+      closeMenu();
+      if (t) t.focus();
+    }
+  });
+
+  // following any link inside a panel closes the menu
+  document.querySelectorAll('.mega-panel a').forEach(function(a){
+    a.addEventListener('click', closeMenu);
+  });
+
+  // plain top-level links also close whatever is open
+  document.querySelectorAll('.nav-firm > .nav-item > a, .nav-audience > .nav-item > a').forEach(function(a){
+    a.addEventListener('click', closeMenu);
+  });
+
+  backdrop.addEventListener('click', closeMenu);
+
+
+  /* ============================================================
+     MOBILE MENU
+     ============================================================ */
+  var hamburgerBtn = document.getElementById('hamburgerBtn');
+  var mobileMenu   = document.getElementById('mobileMenu');
+  var mobileClose  = document.getElementById('mobileCloseBtn');
+  var mobileViews  = document.querySelectorAll('.mobile-view');
+  var viewStack    = ['root'];
+
+  function showView(name){
+    mobileViews.forEach(function(v){
+      var vName = v.getAttribute('data-view');
+      v.removeAttribute('data-active');
+      v.removeAttribute('data-offstage');
+      if (vName === name) v.setAttribute('data-active', 'true');
+      else v.setAttribute('data-offstage', 'left');
+    });
+  }
+
+  function openMobile(){
+    mobileMenu.classList.add('is-open');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+    hamburgerBtn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('no-scroll');
+    viewStack = ['root'];
+    showView('root');
+    mobileClose.focus();
+  }
+
+  function closeMobile(){
+    mobileMenu.classList.remove('is-open');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+    hamburgerBtn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('no-scroll');
+    hamburgerBtn.focus();
+  }
+
+  hamburgerBtn.addEventListener('click', openMobile);
+  mobileClose.addEventListener('click', closeMobile);
+
+  document.querySelectorAll('[data-open-view]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = btn.getAttribute('data-open-view');
+      viewStack.push(target);
+      showView(target);
+    });
+  });
+
+  document.querySelectorAll('[data-back]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      if (viewStack.length > 1) viewStack.pop();
+      showView(viewStack[viewStack.length - 1]);
+    });
+  });
+
+  // any real link tap inside the mobile menu closes it
+  mobileMenu.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', closeMobile);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')){
+      closeMobile();
+    }
+  });
+
+  // if the viewport grows past the mobile breakpoint, reset the panel
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 980 && mobileMenu.classList.contains('is-open')){
+      closeMobile();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>
